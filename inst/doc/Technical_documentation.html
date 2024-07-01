@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Michael Kammer" />
+
+<meta name="date" content="2024-06-29" />
+
+<title>simdata: Technical documentation</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">simdata: Technical documentation</h1>
+<h4 class="author">Michael Kammer</h4>
+<h4 class="date">2024-06-29</h4>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#introduction" id="toc-introduction"><span class="toc-section-number">1</span> Introduction</a></li>
+<li><a href="#simdesign-s3-class" id="toc-simdesign-s3-class"><span class="toc-section-number">2</span> <code>simdesign</code> S3 class</a>
+<ul>
+<li><a href="#subclassing-simdesign" id="toc-subclassing-simdesign"><span class="toc-section-number">2.1</span> Subclassing
+<code>simdesign</code></a></li>
+</ul></li>
+<li><a href="#simulation-of-data" id="toc-simulation-of-data"><span class="toc-section-number">3</span> Simulation of data</a>
+<ul>
+<li><a href="#simulate_data-method" id="toc-simulate_data-method"><span class="toc-section-number">3.1</span> <code>simulate_data</code>
+method</a></li>
+<li><a href="#simulate_data_conditional-function" id="toc-simulate_data_conditional-function"><span class="toc-section-number">3.2</span>
+<code>simulate_data_conditional</code> function</a></li>
+</ul></li>
+<li><a href="#rsession" id="toc-rsession"><span class="toc-section-number">4</span> R session information</a></li>
+</ul>
+</div>
+
+<div id="introduction" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Introduction</h1>
+<p>This document is intended to elaborate on the inner workings of the
+<code>simdata</code> package, for users who may wish to extend it for
+their purposes.</p>
+<p>The <code>simdata</code> package is based on a very simple idea:</p>
+<ul>
+<li>the <code>simdesign</code> S3 class, and any concrete subclass
+implemented by the user, which provides a data generating mechanism, and
+stores all necessary data to simulate data from the data generating
+mechanism</li>
+<li>the <code>simulate_data</code> method for the <code>simdesign</code>
+class, which actually implements drawing from the data generating
+mechanism</li>
+</ul>
+<p>Both key functionalities can be embellished by further features to
+adapt to the task of interest. How to do this is presented in the
+<code>Demo</code> vignette of the package. The package further provides
+some utilities around the core functionality, to assist in simulation
+tasks, but which are not essential to the usage of the package.</p>
+</div>
+<div id="simdesign-s3-class" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> <code>simdesign</code>
+S3 class</h1>
+<p>The main class of this package is the <code>simdesign</code> S3
+class. It is a list with class attribute <code>simdesign</code> and
+entries as defined in the documentation of the <code>simdesign</code>
+class.</p>
+<div id="subclassing-simdesign" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Subclassing
+<code>simdesign</code></h2>
+<p>A template for a constructor implementing a subclass for a specific
+simulation design is given by:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># constructor takes any number of arguments arg1, arg2, and so on</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># and it must use the elipsis ... as final argument</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>new_simdesign <span class="ot">&lt;-</span> <span class="cf">function</span>(arg1, arg2, ...) {</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    </span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="co"># define generator function in one argument</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    generator <span class="ot">=</span> <span class="cf">function</span>(n) {</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>        <span class="co"># implement data generating mechanism</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>        <span class="co"># make use of any argument passed to the new_simdesign constructor</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>        <span class="co"># make sure it returns a two-dimensional array</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>    }</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>    </span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>    <span class="co"># setup simdesign subclass</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>    <span class="co"># make sure to pass generator function and ...</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>    <span class="co"># all other information passed is optional</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>    dsgn <span class="ot">=</span> <span class="fu">simdesign</span>(</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>        <span class="at">generator =</span> generator, </span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>        <span class="at">arg1 =</span> arg1, </span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>        <span class="at">arg2 =</span> arg2, </span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>        ...</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>    )</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>    </span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>    <span class="co"># extend the class attribute </span></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>    <span class="fu">class</span>(dsgn) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&quot;binomial_simdesign&quot;</span>, <span class="fu">class</span>(dsgn))</span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>    </span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>    <span class="co"># return the object</span></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>    dsgn</span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>}</span></code></pre></div>
+<p>Examples for actual implementations are provided in the
+<code>Demo</code> vignette of this package.</p>
+</div>
+</div>
+<div id="simulation-of-data" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Simulation of data</h1>
+<div id="simulate_data-method" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span>
+<code>simulate_data</code> method</h2>
+<p>The data generation in the <code>simulate_data</code> method follows
+a simple recipe. In principle, the method can be used without a
+<code>simdesign</code> object, but here we assume they are used
+together. In the following graphic, circular shapes denote
+functions.</p>
+<p><svg id="svg2" style="width:100.0%" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="723.34125" stroke-miterlimit="10" font-weight="normal" height="261.72452" font-style="normal" font-size="12px" inkscape:version="0.91 r13725" sodipodi:docname="overview.svg">
+  <metadata id="svg2_metadata111">
+    <rdf:RDF>
+      <cc:Work rdf:about>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="2048" inkscape:window-height="1105" id="svg2_namedview109" showgrid="false" inkscape:zoom="0.85228758" inkscape:cx="-34.999238" inkscape:cy="70.634724" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:window-maximized="1" inkscape:current-layer="svg2" fit-margin-top="0" fit-margin-left="0" fit-margin-right="0" fit-margin-bottom="0"></sodipodi:namedview>
+  <!--Generated by ySVG 2.5-->
+  <defs id="svg2_genericDefs">
+    <marker inkscape:stockid="Arrow1Lstart" orient="auto" refY="0" refX="0" id="svg2_Arrow1Lstart" style="overflow:visible" inkscape:isstock="true">
+      <path id="svg2_path4350" d="M 0,0 5,-5 -12.5,0 5,5 0,0 Z" style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt" transform="matrix(0.8,0,0,0.8,10,0)" inkscape:connector-curvature="0" />
+    </marker>
+    <defs id="svg2_defs1">
+      <clipPath id="svg2_clipPath1" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path9" d="M 0,0 765,0 765,252 0,252 0,0 Z" inkscape:connector-curvature="0" />
+      </clipPath>
+      <clipPath id="svg2_clipPath2" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path12" d="m 66,196 765,0 0,252 -765,0 0,-252 z" inkscape:connector-curvature="0" />
+      </clipPath>
+      <clipPath id="svg2_clipPath3" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path15" d="M 0,0 0,38 64,38 64,0 Z" inkscape:connector-curvature="0" />
+      </clipPath>
+      <clipPath id="svg2_clipPath4" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path18" d="m 0,0 0,38 131,0 0,-38 z" inkscape:connector-curvature="0" />
+      </clipPath>
+      <clipPath id="svg2_clipPath6" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path24" d="M 0,0 0,38 63,38 63,0 Z" inkscape:connector-curvature="0" />
+      </clipPath>
+      <clipPath id="svg2_clipPath7" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path27" d="M 0,0 0,19 72,19 72,0 Z" inkscape:connector-curvature="0" />
+      </clipPath>
+    </defs>
+  </defs>
+  <text x="28" xml:space="preserve" y="15" clip-path="url(#clipPath3)" id="svg2_text35" style="font-weight:bold;font-size:medium;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(174.42017,142.066)">Z</text>
+  <text x="36" xml:space="preserve" y="15" clip-path="url(#clipPath3)" font-weight="normal" id="svg2_text37" style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(174.42017,142.066)" sodipodi:linespacing="125%"> </text>
+  <text x="174.42017" xml:space="preserve" y="176.06599" clip-path="none" font-weight="normal" id="svg2_text39" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" sodipodi:linespacing="125%">Initial data</text>
+  <text x="59" xml:space="preserve" y="15" clip-path="url(#clipPath4)" id="svg2_text43" style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(579.42017,142.066)" sodipodi:linespacing="125%">X&#39;</text>
+  <text x="71" xml:space="preserve" y="15" clip-path="url(#clipPath4)" font-weight="normal" id="svg2_text45" style="font-weight:normal;font-size:medium;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(579.42017,142.066)"> </text>
+  <text x="0" xml:space="preserve" y="34" clip-path="url(#clipPath4)" font-weight="normal" id="svg2_text47" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(579.42017,142.066)" sodipodi:linespacing="125%">Post-processed data</text>
+  <g style="stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" id="svg2_g49" transform="translate(-96.579832,-210.93401)" stroke-miterlimit="1.45">
+    <ellipse style="fill:none" id="svg2_ellipse51" cy="248.53" cx="303" clip-path="url(#clipPath2)" ry="22" rx="64"></ellipse>
+  </g>
+  <text x="273.0347" xml:space="preserve" y="254.0295" clip-path="url(#clipPath2)" id="svg2_text55" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" sodipodi:linespacing="125%">generator</text>
+  <ellipse rx="64" ry="22" clip-path="url(#clipPath2)" cx="518" cy="248.53" id="svg2_ellipse57" style="font-size:medium;font-family:sans-serif;fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)"></ellipse>
+  <text x="468.59329" xml:space="preserve" y="254.0295" clip-path="url(#clipPath2)" id="svg2_text59" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" sodipodi:linespacing="125%">transform_initial</text>
+  <text x="-0.57983398" xml:space="preserve" y="166.06599" clip-path="none" id="svg2_text63" style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" sodipodi:linespacing="125%">simulate_data</text>
+  <text x="27" xml:space="preserve" y="15" clip-path="url(#clipPath6)" id="svg2_text67" style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(389.42017,142.066)" sodipodi:linespacing="125%">X</text>
+  <text x="36" xml:space="preserve" y="15" clip-path="url(#clipPath6)" font-weight="normal" id="svg2_text69" style="font-weight:normal;font-size:medium;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(389.42017,142.066)"> </text>
+  <text x="0" xml:space="preserve" y="34" clip-path="url(#clipPath6)" font-weight="normal" id="svg2_text71" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(389.42017,142.066)" sodipodi:linespacing="125%">Final data</text>
+  <ellipse rx="64" ry="22" clip-path="url(#clipPath2)" cx="742.20001" cy="248.53" id="svg2_ellipse75" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)"></ellipse>
+  <text x="700.95538" font-size="14px" y="254.0295" clip-path="url(#clipPath2)" xml:space="preserve" id="svg2_text77" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" sodipodi:linespacing="125%">process_final</text>
+  <rect x="226.2" width="589.20001" height="74.192001" y="337.7876" clip-path="url(#clipPath2)" id="svg2_rect79" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <rect x="226.2" width="589.20001" height="74.192001" y="211.43401" clip-path="url(#clipPath2)" id="svg2_rect81" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <text x="0" xml:space="preserve" y="15" clip-path="url(#clipPath7)" id="svg2_text85" style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(12.420168,28.065994)" sodipodi:linespacing="125%">simdesign</text>
+  <path d="m 302.9373,270.53 -0.1897,66.5142" clip-path="url(#clipPath2)" id="svg2_path89" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 302.7248,345.0441 5.0342,-11.9857 -5.0086,2.9858 -4.9914,-3.0143 z" clip-path="url(#clipPath2)" id="svg2_path91" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 367,372 79,0" clip-path="url(#clipPath2)" id="svg2_path93" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 454,372 -12,-5 3,5 -3,5 z" clip-path="url(#clipPath2)" id="svg2_path95" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="M 518,270.53 518,337" clip-path="url(#clipPath2)" id="svg2_path97" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 518,345 5,-12 -5,3 -5,-3 z" clip-path="url(#clipPath2)" id="svg2_path99" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 582,372.586 0.8,0.007 78.2001,-0.2912" clip-path="url(#clipPath2)" id="svg2_path101" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 669,372.2725 -12.0185,-4.9553 3.0186,4.9888 -2.9814,5.0111 z" clip-path="url(#clipPath2)" id="svg2_path103" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 742.2,270.53 0,66.47" clip-path="url(#clipPath2)" id="svg2_path105" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path d="m 742.2,345 5,-12 -5,3 -5,-3 z" clip-path="url(#clipPath2)" id="svg2_path107" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-96.579832,-210.93401)" />
+  <path id="svg2_path4616-9" style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1" d="m 425.27923,208.51829 c 0.68416,33.29937 -99.88709,0 -113.57024,33.29937 M 198.31644,208.54141 c -0.68416,33.29938 99.88709,0 113.57024,33.29938" inkscape:connector-curvature="0" />
+  <text x="262.44904" xml:space="preserve" y="259.14273" clip-path="none" font-weight="normal" id="svg2_text39-9" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" sodipodi:linespacing="125%">Data generation</text>
+  <text x="568.73309" xml:space="preserve" y="226.12283" clip-path="none" font-weight="normal" id="svg2_text39-9-6" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" sodipodi:linespacing="125%">Optional data processing</text>
+</svg></p>
+<ol style="list-style-type: decimal">
+<li>Data is drawn from an initial distribution using the
+<code>generator</code> field (a function object) of the
+<code>simdesign</code> class.
+<ul>
+<li>Relevant input: the function stored in the <code>generator</code>
+field of the <code>simdesign</code>class, <code>n_obs</code> (number of
+observations), any further argument passed to <code>simulate_data</code>
+which is not specified in the documentation</li>
+<li>Output: initial generated dataset <code>Z</code></li>
+</ul></li>
+<li>The initial data <code>Z</code> is transformed by one or several
+functions which are applied to the dataset.
+<ul>
+<li>Relevant input: <code>Z</code>, function stored in the
+<code>transform_initial</code> field of the <code>simdesign</code> class
+(can be implemented by using a <code>function_list</code>, see
+documentation of this package)</li>
+<li>Default: <code>base::identity</code> is used to return the dataset
+<code>Z</code> unchanged</li>
+<li>Output: final generated dataset <code>X</code></li>
+</ul></li>
+<li>Optional: the final data <code>X</code> can be post-processed before
+further usage.
+<ul>
+<li>Relevant input: <code>X</code>, functions stored in the
+<code>process_final</code> field of the <code>simdesign</code>
+object</li>
+<li>Default: <code>base::identity</code> is used to return the dataset
+<code>X</code> unchanged</li>
+<li>Output: post-processed dataset <code>X&#39;</code>.</li>
+</ul></li>
+</ol>
+<p>The final output of the method is a dataset (a matrix or data.frame
+depending on the data generating mechanism) which can be used in further
+analysis steps.</p>
+<div id="implemented-methods" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Implemented
+methods</h3>
+<p><code>simulate_data</code> is a S3 method, which implements</p>
+<ul>
+<li><code>simulate_data.default</code>: the default method doing all the
+actual work</li>
+<li><code>simulate_data.simdesign</code>: calls
+<code>simulate_data.default</code> with appropriate parameters as stored
+in the <code>simdesign</code> object; the intended way to use this
+function</li>
+</ul>
+</div>
+</div>
+<div id="simulate_data_conditional-function" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span>
+<code>simulate_data_conditional</code> function</h2>
+<p>Data can be simulated to conform to specific user-specified
+constraints. These constraints are implemented through a rejection
+function applied to a simulated dataset. Only datasets for which the
+function returns FALSE (i.e. not rejected) are returned. This is
+implemented by repeatedly calling <code>simulate_data</code> to obtain
+new instances of datasets from the data generating mechanism, either
+until the rejection function accepts the dataset, or until a maximum
+number of iterations was conducted. This process is depicted in the
+following diagram, in which circular shaps denote functions.</p>
+<p><svg id="svg2" style="width:100.0%" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" fill-opacity="1" color-rendering="auto" color-interpolation="auto" text-rendering="auto" stroke="black" stroke-linecap="square" width="793" stroke-miterlimit="10" shape-rendering="auto" stroke-opacity="1" fill="black" stroke-dasharray="none" font-weight="normal" stroke-width="1" height="283" font-family="&#39;Dialog&#39;" font-style="normal" stroke-linejoin="miter" font-size="12px" stroke-dashoffset="0" image-rendering="auto" inkscape:version="0.91 r13725" sodipodi:docname="simulate_data_conditional.svg" viewBox="0 0 793 283">
+  <metadata id="svg2_metadata104">
+    <rdf:RDF>
+      <cc:Work rdf:about>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview pagecolor="#ffffff" bordercolor="#666666" borderopacity="1" objecttolerance="10" gridtolerance="10" guidetolerance="10" inkscape:pageopacity="0" inkscape:pageshadow="2" inkscape:window-width="2048" inkscape:window-height="1105" id="svg2_namedview102" showgrid="false" inkscape:zoom="1.1627582" inkscape:cx="463.27075" inkscape:cy="20.521534" inkscape:window-x="-8" inkscape:window-y="-8" inkscape:window-maximized="1" inkscape:current-layer="svg2"></sodipodi:namedview>
+  <!--Generated by ySVG 2.5-->
+  <defs id="svg2_genericDefs">
+    <defs id="svg2_defs1">
+      <clipPath id="svg2_clipPath1" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path9" d="M0 0 L793 0 L793 283 L0 283 L0 0 Z" />
+      </clipPath>
+      <clipPath id="svg2_clipPath2" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path12" d="M12 211 L805 211 L805 494 L12 494 L12 211 Z" />
+      </clipPath>
+      <clipPath id="svg2_clipPath3" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path15" d="M0 0 L0 38 L97 38 L97 0 Z" />
+      </clipPath>
+      <clipPath id="svg2_clipPath4" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path18" d="M0 0 L0 19 L105 19 L105 0 Z" />
+      </clipPath>
+      <clipPath id="svg2_clipPath5" clipPathUnits="userSpaceOnUse">
+        <path id="svg2_path21" d="M0 0 L0 38 L82 38 L82 0 Z" />
+      </clipPath>
+    </defs>
+  </defs>
+  <text x="42" xml:space="preserve" y="15" clip-path="url(#clipPath3)" id="svg2_text32" style="font-weight:bold;font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(242,142)" sodipodi:linespacing="125%">X&#39;</text>
+  <text x="54" xml:space="preserve" y="15" clip-path="url(#clipPath3)" font-weight="normal" id="svg2_text34" style="font-weight:normal;font-size:medium;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(242,142)"> </text>
+  <text x="0" xml:space="preserve" y="34" clip-path="url(#clipPath3)" font-weight="normal" id="svg2_text36" style="font-weight:normal;font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(242,142)" sodipodi:linespacing="125%">Candidate data</text>
+  <text x="0" xml:space="preserve" y="15" clip-path="url(#clipPath4)" id="svg2_text40" style="font-weight:bold;font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(453,151)" sodipodi:linespacing="125%">TRUE / FALSE   </text>
+  <text x="105" xml:space="preserve" y="15" clip-path="url(#clipPath4)" font-weight="normal" id="svg2_text42" style="font-weight:normal;font-size:medium;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(453,151)"> </text>
+  <text x="36" xml:space="preserve" y="15" clip-path="url(#clipPath5)" id="svg2_text46" style="font-weight:bold;font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(672,142)" sodipodi:linespacing="125%">X</text>
+  <text x="45" xml:space="preserve" y="15" clip-path="url(#clipPath5)" font-weight="normal" id="svg2_text48" style="font-weight:normal;font-size:medium;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(672,142)"> </text>
+  <text x="0" xml:space="preserve" y="34" clip-path="none" font-weight="normal" id="svg2_text50" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(672,142)" sodipodi:linespacing="125%">Return data</text>
+  <ellipse rx="64" ry="22" clip-path="url(#clipPath2)" cx="303" cy="248.53" id="svg2_ellipse54" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)"></ellipse>
+  <text x="259.41751" xml:space="preserve" y="254.0295" clip-path="url(#clipPath2)" id="svg2_text58" style="font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(-12,-211)" sodipodi:linespacing="125%">simulate_data</text>
+  <ellipse rx="64" ry="22" clip-path="url(#clipPath2)" cx="518" cy="248.53" id="svg2_ellipse60" style="font-size:medium;font-family:sans-serif;fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)"></ellipse>
+  <text x="500.88281" xml:space="preserve" y="254.0295" clip-path="url(#clipPath2)" id="svg2_text62" style="font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(-12,-211)" sodipodi:linespacing="125%">reject</text>
+  <text x="601.22333" xml:space="preserve" y="384.05951" clip-path="url(#clipPath2)" id="svg2_text64" style="font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(-12,-211)" sodipodi:linespacing="125%">accept</text>
+  <text x="367.73309" xml:space="preserve" y="448.88379" clip-path="url(#clipPath2)" id="svg2_text66" style="font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(-12,-211)" sodipodi:linespacing="125%">try again until</text>
+  <text x="316.78491" xml:space="preserve" y="466.03519" clip-path="url(#clipPath2)" id="svg2_text68" style="font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(-12,-211)" sodipodi:linespacing="125%">success or maximum iteration</text>
+  <rect x="220" width="558.79999" height="142.192" y="336.80801" clip-path="url(#clipPath2)" id="svg2_rect70" style="font-size:medium;font-family:sans-serif;fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <text x="4.0996394" xml:space="preserve" y="200" clip-path="none" id="svg2_text74" style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:12.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:&#39;sans-serif, Bold&#39;;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" sodipodi:linespacing="125%">simulate_data_conditional</text>
+  <path d="m 367,372 79,0" clip-path="url(#clipPath2)" id="svg2_path78" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <path d="m 454,372 -12,-5 3,5 -3,5 z" clip-path="url(#clipPath2)" id="svg2_path80" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <path d="m 518,399 0,36.33 -215,0 0,-28.33" clip-path="url(#clipPath2)" id="svg2_path82" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <path d="m 303,399 -5,12 5,-3 5,3 z" clip-path="url(#clipPath2)" id="svg2_path84" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <text x="391.44479" font-size="14px" y="428.25381" clip-path="url(#clipPath2)" xml:space="preserve" id="svg2_text86" style="font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(-12,-211)" sodipodi:linespacing="125%">TRUE</text>
+  <path d="m 582,372 71.6947,0" clip-path="url(#clipPath2)" id="svg2_path88" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <path d="m 661.6947,372 -12,-5 3,5 -3,5 z" clip-path="url(#clipPath2)" id="svg2_path90" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <text x="599.67157" font-size="14px" y="366.9238" clip-path="url(#clipPath2)" xml:space="preserve" id="svg2_text92" style="font-size:12.5px;font-family:sans-serif;stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision;-inkscape-font-specification:&#39;sans-serif, Normal&#39;;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal;text-anchor:start;text-align:start;writing-mode:lr;line-height:125%;" transform="translate(-12,-211)" sodipodi:linespacing="125%">FALSE</text>
+  <path d="m 302.9373,270.53 -0.1897,66.5142" clip-path="url(#clipPath2)" id="svg2_path94" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <path d="m 302.7248,345.0441 5.0342,-11.9857 -5.0086,2.9858 -4.9914,-3.0143 z" clip-path="url(#clipPath2)" id="svg2_path96" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <path d="M 518,270.53 518,337" clip-path="url(#clipPath2)" id="svg2_path98" inkscape:connector-curvature="0" style="fill:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+  <path d="m 518,345 5,-12 -5,3 -5,-3 z" clip-path="url(#clipPath2)" id="svg2_path100" inkscape:connector-curvature="0" style="stroke:none;stroke-linecap:butt;stroke-miterlimit:1.45000005;shape-rendering:geometricPrecision;text-rendering:geometricPrecision" transform="translate(-12,-211)" />
+</svg></p>
+</div>
+</div>
+<div id="rsession" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> R session
+information</h1>
+<pre><code>## R version 4.4.0 (2024-04-24 ucrt)
+## Platform: x86_64-w64-mingw32/x64
+## Running under: Windows 10 x64 (build 17763)
+## 
+## Matrix products: default
+## 
+## 
+## locale:
+## [1] LC_COLLATE=C                    LC_CTYPE=German_Austria.1252   
+## [3] LC_MONETARY=German_Austria.1252 LC_NUMERIC=C                   
+## [5] LC_TIME=German_Austria.1252    
+## 
+## time zone: Europe/Vienna
+## tzcode source: internal
+## 
+## attached base packages:
+## [1] parallel  stats     graphics  grDevices utils     datasets  methods  
+## [8] base     
+## 
+## other attached packages:
+##  [1] ggcorrplot_0.1.4.1  patchwork_1.2.0     dplyr_1.1.4        
+##  [4] fitdistrplus_1.1-11 survival_3.5-8      MASS_7.3-60.2      
+##  [7] nhanesA_1.1         doRNG_1.8.6         rngtools_1.5.2     
+## [10] doParallel_1.0.17   iterators_1.0.14    foreach_1.5.2      
+## [13] knitr_1.46          GGally_2.2.1        reshape2_1.4.4     
+## [16] ggplot2_3.5.1       simdata_0.4.0      
+## 
+## loaded via a namespace (and not attached):
+##  [1] sass_0.4.9         utf8_1.2.4         generics_0.1.3     tidyr_1.3.1       
+##  [5] xml2_1.3.6         lattice_0.22-6     stringi_1.8.4      digest_0.6.35     
+##  [9] magrittr_2.0.3     evaluate_0.23      grid_4.4.0         RColorBrewer_1.1-3
+## [13] mvtnorm_1.2-4      fastmap_1.2.0      Matrix_1.7-0       plyr_1.8.9        
+## [17] jsonlite_1.8.8     httr_1.4.7         rvest_1.0.4        selectr_0.4-2     
+## [21] purrr_1.0.2        fansi_1.0.6        viridisLite_0.4.2  scales_1.3.0      
+## [25] codetools_0.2-20   jquerylib_0.1.4    cli_3.6.2          rlang_1.1.3       
+## [29] splines_4.4.0      munsell_0.5.1      withr_3.0.0        cachem_1.1.0      
+## [33] yaml_2.3.8         tools_4.4.0        colorspace_2.1-0   ggstats_0.6.0     
+## [37] curl_5.2.1         vctrs_0.6.5        R6_2.5.1           lifecycle_1.0.4   
+## [41] stringr_1.5.1      foreign_0.8-86     pkgconfig_2.0.3    pillar_1.9.0      
+## [45] bslib_0.7.0        gtable_0.3.5       glue_1.7.0         Rcpp_1.0.12       
+## [49] highr_0.10         xfun_0.44          tibble_3.2.1       tidyselect_1.2.1  
+## [53] rstudioapi_0.16.0  farver_2.1.2       igraph_2.0.3       htmltools_0.5.8.1 
+## [57] rmarkdown_2.27     labeling_0.4.3     compiler_4.4.0</code></pre>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
