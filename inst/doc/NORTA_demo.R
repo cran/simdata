@@ -1,29 +1,31 @@
 ## ----message=FALSE, warning=FALSE, include=FALSE------------------------------
 library(simdata)
-library(nhanesA)
 library(fitdistrplus)
 library(dplyr)
 library(ggplot2)
 library(patchwork)
 library(ggcorrplot)
 
-## ----echo=TRUE, message=FALSE, warning=FALSE----------------------------------
-df = nhanesA::nhanes("DEMO_J") %>% 
-  left_join(nhanesA::nhanes("BMX_J")) %>% 
-  left_join(nhanesA::nhanes("BPX_J")) %>% 
-  dplyr::select(Gender = RIAGENDR, 
-                Age = RIDAGEYR, 
-                Race = RIDRETH1, 
-                Weight = BMXWT, 
-                BMI = BMXBMI, 
-                BPsys = BPXSY1, 
-                BPdia = BPXDI1) %>% 
-  filter(complete.cases(.)) %>% 
-  filter(Age > 18) %>% 
-  mutate(Gender = as.numeric(Gender), 
-         Race = as.numeric(Race))
+knitr::opts_chunk$set(
+  error = TRUE,
+  eval = requireNamespace("NHANES", quietly = TRUE)
+)
 
-print(head(df))
+## ----eval=TRUE, echo=TRUE, message=FALSE, warning=FALSE-----------------------
+if (requireNamespace("NHANES", quietly = TRUE)) {
+    df = NHANES::NHANES %>% 
+        filter(SurveyYr == "2011_12") %>%
+        select(Gender, Age, Race = Race1, Weight, 
+               BMI, BPsys = BPSys1, BPdia = BPDia1) %>% 
+        filter(complete.cases(.)) %>% 
+        filter(Age > 18) %>% 
+        mutate(Gender = if_else(Gender == "male", 1, 2), 
+               Race = as.numeric(Race))
+    
+    print(head(df))
+} else {
+    message("Package 'NHANES' not available.")
+}
 
 ## ----echo=TRUE----------------------------------------------------------------
 cor_target = cor(df)
@@ -52,30 +54,30 @@ dist[["Age"]] = stats::approxfun(int_dens[, "cdf"], int_dens[, "Age"],
 
 # race
 dist[["Race"]] = function(x) 
-    cut(x, breaks = c(0, 0.135, 0.227, 0.575, 0.806, 1), 
+    cut(x, breaks = c(0, 0.112, 0.177, 0.253, 0.919, 1), 
         labels = 1:5)
 
 # weight
 fit = fitdistrplus::fitdist(as.numeric(df$Weight), "gamma")
 summary(fit)
-dist[["Weight"]] = function(x) qgamma(x, shape = 14.44, rate = 0.17)
+dist[["Weight"]] = function(x) qgamma(x, shape = 16.5031110, rate = 0.2015375)
 
 # bmi
 fit = fitdistrplus::fitdist(as.numeric(df$BMI), "lnorm")
 summary(fit)
-dist[["BMI"]] = function(x) qlnorm(x, meanlog = 3.36, sdlog = 0.23)
+dist[["BMI"]] = function(x) qlnorm(x, meanlog = 3.3283118, sdlog = 0.2153347)
 
 # systolic blood pressure
 fit = fitdistrplus::fitdist(as.numeric(df$BPsys), "lnorm")
 summary(fit)
-dist[["BPsys"]] = function(x) qlnorm(x, meanlog = 4.83, sdlog = 0.15)
+dist[["BPsys"]] = function(x) qlnorm(x, meanlog = 4.796213, sdlog = 0.135271)
 
 # diastolic blood pressure
 fit = fitdistrplus::fitdist(as.numeric(df %>% 
                                          filter(BPdia > 0) %>% 
                                          pull(BPdia)), "norm")
 summary(fit)
-dist[["BPdia"]] = function(x) qnorm(x, mean = 72.42, sd = 11.95)
+dist[["BPdia"]] = function(x) qnorm(x, mean = 71.75758, sd = 11.36352)
 
 ## -----------------------------------------------------------------------------
 # use automated specification
